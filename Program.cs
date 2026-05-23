@@ -8,8 +8,45 @@ using Amazon.S3.Model;
 
 class Program
 {
+  static void PrintUsage()
+  {
+    Console.WriteLine("Usage: dotnet run");
+    Console.WriteLine();
+    Console.WriteLine("Queries PostgreSQL for artwork rows that have a reference image but no");
+    Console.WriteLine("Front-view in artwork_image. Downloads each source JPG from S3 (S3:Prefix)");
+    Console.WriteLine("and saves it under Output:Directory with a HumanId-based filename.");
+    Console.WriteLine("Already-downloaded files are skipped (safe to re-run).");
+    Console.WriteLine();
+    Console.WriteLine("Options:");
+    Console.WriteLine("  -h, --help, -?, /?, ?     show this help and exit");
+    Console.WriteLine();
+    Console.WriteLine("Configuration (appsettings.json):");
+    Console.WriteLine("  PostgreSQL:SecretArn      AWS Secrets Manager ARN holding DB user/pass");
+    Console.WriteLine("  PostgreSQL:Host/Database  connection details");
+    Console.WriteLine("  S3:BucketName             S3 bucket (default: keithlong-art-photos)");
+    Console.WriteLine("  S3:Prefix                 source key prefix (default: jpg/)");
+    Console.WriteLine("  Output:Directory          download directory (default: images)");
+  }
+
   static async Task Main(string[] args)
   {
+    if (args.Any(a => a is "-h" or "--help" or "-?" or "/?" or "?"))
+    {
+      PrintUsage();
+      return;
+    }
+    foreach (var a in args)
+    {
+      if (a.StartsWith("-") || a.StartsWith("/"))
+      {
+        Console.WriteLine($"Unknown option: {a}");
+        Console.WriteLine();
+        PrintUsage();
+        Environment.ExitCode = 1;
+        return;
+      }
+    }
+
     var configuration = new ConfigurationBuilder()
       .SetBasePath(Directory.GetCurrentDirectory())
       .AddJsonFile("appsettings.json")
