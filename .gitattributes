@@ -1,0 +1,2 @@
+# Windows-only workspace: preserve CRLF byte-for-byte, never convert.
+* -text
