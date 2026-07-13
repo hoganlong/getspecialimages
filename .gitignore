@@ -34,3 +34,6 @@ images_first/
 
 # One-off zip files
 *.zip
+
+# Local secrets - do not commit
+appsettings.json
